@@ -1,0 +1,27 @@
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
+from sklearn.feature_selection import SelectKBest, chi2, f_classif, mutual_info_classif
+from sklearn import svm
+import pandas as pnd
+
+
+
+encoder = LabelEncoder()
+
+
+
+dadosDeTreino = pnd.read_csv('train.csv')
+encoder.fit(dadosDeTreino['explicit'])
+dadosDeTreino['explicit'] = encoder.transform(dadosDeTreino['explicit'])
+encoder.fit(dadosDeTreino['track_genre'])
+dadosDeTreino['track_genre'] = encoder.transform(dadosDeTreino['track_genre'])
+x=dadosDeTreino[[ 'duration_ms', 'explicit', 'danceability', 'energy', 'key', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'time_signature', 'track_genre']]
+y=dadosDeTreino['popularity_target']
+x_teste, x_treino, y_teste, y_treino = train_test_split(x,y, test_size=0.2, random_state=42)
+modelo = RandomForestClassifier(bootstrap=False, criterion='entropy', max_depth=None, max_leaf_nodes=None, min_samples_leaf=1, min_samples_split=2, n_estimators=1000, n_jobs=-1, random_state=42, warm_start=True)
+modelo.fit(x_treino, y_treino)
+y_pred = modelo.predict(x_teste)
+print(accuracy_score(y_teste, y_pred))
